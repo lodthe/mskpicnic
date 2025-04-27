@@ -1,0 +1,19 @@
+version: "3.8"
+
+services:
+  mskpicnic-bot:
+    build: .
+    container_name: mskpicnic-bot
+    restart: unless-stopped
+    environment:
+      # Required: Provide your Telegram Bot Token here or via a .env file
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
+      # Paths inside the container (match defaults in main.go)
+      - DB_PATH=/opt/data/mskpicnic.db
+      - EVENTS_CACHE_PATH=/opt/data/events_cache.json
+      # Optional: Uncomment and set if needed
+      # - CHECK_DAYS=30
+      # - DEBUG=false
+    volumes:
+      # Mount a local directory 'data' to persist the database and cache
+      - ./data:/opt/data
