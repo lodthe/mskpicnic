@@ -136,7 +136,7 @@ type AvailabilityItem struct {
 // NewClient creates a new mos.ru API client
 func NewClient(debug bool) *Client {
 	// Initialize the rate limiter (e.g., 5 requests/sec, burst 5)
-	limiter := rate.NewLimiter(5, 5)
+	limiter := rate.NewLimiter(20, 5)
 	log.Printf("Initialized mosru.Client rate limiter: %v requests/sec, burst %d", limiter.Limit(), limiter.Burst())
 
 	return &Client{
@@ -244,7 +244,7 @@ func (c *Client) IsAvailable(date string, eventID int) (bool, error) {
 	}
 	toDate := parsedDate.AddDate(0, 0, 1).Format("2006-01-02")
 
-	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second) // Slightly increased timeout
+	ctx, cancel := context.WithTimeout(context.Background(), 300*time.Second) // Slightly increased timeout
 	defer cancel()
 
 	url := fmt.Sprintf("https://tickets.mos.ru/widget/api/widget/performance_free_seats?date_from=%s&date_to=%s&event_id=%d", date, toDate, eventID)
@@ -329,7 +329,7 @@ func (c *Client) ListSlots(date string, eventID int, agentUID string) ([]Slot, e
 	if c.Debug {
 		fmt.Printf("Listing slots %s %d %s\n", date, eventID, agentUID)
 	}
-	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second) // Slightly increased timeout
+	ctx, cancel := context.WithTimeout(context.Background(), 300*time.Second) // Slightly increased timeout
 	defer cancel()
 
 	url := fmt.Sprintf("https://tickets.mos.ru/widget/api/widget/events/getperformances?event_id=%d&agent_uid=%s&date=%s", eventID, agentUID, date)
@@ -350,7 +350,7 @@ func (c *Client) GetTariff(performanceID int, agentUID string) (*TariffData, err
 	if c.Debug {
 		fmt.Printf("Fetching tariff for performance %d (agent %s)\n", performanceID, agentUID)
 	}
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second) // Short timeout for tariff
+	ctx, cancel := context.WithTimeout(context.Background(), 300*time.Second) // Short timeout for tariff
 	defer cancel()
 
 	url := fmt.Sprintf("https://tickets.mos.ru/widget/api/widget/performance/gettariffs?performance_id=%d&agent_uid=%s", performanceID, agentUID)
